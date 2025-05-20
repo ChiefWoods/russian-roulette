@@ -15,7 +15,7 @@ declare_id!("2BVvhg32vNF6mnqDv78373CwwDwhmjRkbmBHe2Gkx2i1");
 pub mod russian_roulette {
     use super::*;
 
-    pub fn initialize(ctx: Context<Initialize>) -> Result<()> {
-        initialize::handler(ctx)
+    pub fn spin_and_pull_trigger(ctx: Context<SpinAndPullTrigger>, force: [u8; 32]) -> Result<()> {
+        SpinAndPullTrigger::handler(ctx, force)
     }
 }
