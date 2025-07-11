@@ -1,21 +1,26 @@
 import { beforeAll, describe, expect, test } from "bun:test";
-import { emulateFulfill, getSetup } from "./setup";
+import {
+  emulateFulfill,
+  expectAnchorError,
+  fundedSystemAccountInfo,
+  getSetup,
+} from "./setup";
 import { RussianRoulette } from "../target/types/russian_roulette";
 import { LiteSVMProvider } from "anchor-litesvm";
-import { AnchorError, BN, Program } from "@coral-xyz/anchor";
+import { BN, Program } from "@coral-xyz/anchor";
 import {
   InitBuilder,
   Orao,
   randomnessAccountAddress,
 } from "@orao-network/solana-vrf";
-import { Keypair, LAMPORTS_PER_SOL, SystemProgram } from "@solana/web3.js";
+import { Keypair } from "@solana/web3.js";
 import { fetchPlayerAcc } from "./accounts";
 import { getPlayerPda } from "./pda";
 import { LiteSVM } from "litesvm";
 
 describe("russian-roulette", () => {
-  let { client, program, provider, vrf } = {} as {
-    client: LiteSVM;
+  let { litesvm, program, provider, vrf } = {} as {
+    litesvm: LiteSVM;
     program: Program<RussianRoulette>;
     provider: LiteSVMProvider;
     vrf: Orao;
@@ -23,7 +28,7 @@ describe("russian-roulette", () => {
 
   const [treasury, fulfillmentAuthority, authority] = Array.from(
     { length: 3 },
-    Keypair.generate
+    Keypair.generate,
   );
   const [playerPda] = getPlayerPda(authority.publicKey);
   let currentRound: number;
@@ -31,18 +36,13 @@ describe("russian-roulette", () => {
   let force: Buffer;
 
   beforeAll(async () => {
-    ({ client, program, provider, vrf } = getSetup(
+    ({ litesvm, program, provider, vrf } = getSetup(
       [treasury, fulfillmentAuthority, authority].map((kp) => {
-        pubkey: return {
+        return {
           pubkey: kp.publicKey,
-          account: {
-            data: new Uint8Array(0),
-            executable: false,
-            lamports: LAMPORTS_PER_SOL,
-            owner: SystemProgram.programId,
-          },
+          account: fundedSystemAccountInfo(),
         };
-      })
+      }),
     ));
 
     await new InitBuilder(
@@ -50,7 +50,7 @@ describe("russian-roulette", () => {
       provider.publicKey,
       treasury.publicKey,
       [fulfillmentAuthority.publicKey],
-      new BN(100)
+      new BN(100),
     ).rpc();
   });
 
@@ -88,10 +88,7 @@ describe("russian-roulette", () => {
         .signers([authority])
         .rpc();
     } catch (err) {
-      expect(err).toBeInstanceOf(AnchorError);
-
-      const { code } = (err as AnchorError).error.errorCode;
-      expect(code).toBe("CylinderStillSpinning");
+      expectAnchorError(err, "CylinderStillSpinning");
     }
   });
 
@@ -142,10 +139,7 @@ describe("russian-roulette", () => {
         .signers([authority])
         .rpc();
     } catch (err) {
-      expect(err).toBeInstanceOf(AnchorError);
-
-      const { code } = (err as AnchorError).error.errorCode;
-      expect(code).toBe("PlayerDead");
+      expectAnchorError(err, "PlayerDead");
     }
   });
 });

@@ -14,7 +14,7 @@ Game for [Orao Network Solana VRF](https://orao.network/solana-vrf) tutorial.
 ### Libraries
 
 - [@coral-xyz/anchor](https://www.anchor-lang.com/)
-- [@solana/web3.js](https://solana-labs.github.io/solana-web3.js/)
+- [@solana/web3.js](https://solana-foundation.github.io/solana-web3.js/)
 - [litesvm](https://github.com/LiteSVM/litesvm/tree/master/crates/node-litesvm)
 - [anchor-litesvm](https://github.com/LiteSVM/anchor-litesvm/)
 - [@orao-network/solana-vrf](https://github.com/orao-network/solana-vrf/)
@@ -32,12 +32,12 @@ Game for [Orao Network Solana VRF](https://orao.network/solana-vrf) tutorial.
 
 ### Prerequisites
 
-Update your Solana CLI, Bun toolkit and avm.
+1. Update your Solana CLI, avm and Bun toolkit to the latest version
 
 ```bash
-bun upgrade
 agave-install init 2.1.21
 avm use 0.31.1
+bun upgrade
 ```
 
 ### Setup
